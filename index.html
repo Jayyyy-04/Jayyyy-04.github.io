@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <!-- Styles -->
+  <style>
+    #header {
+      text-align: center;
+    }
+    .location {
+      text-align: right;
+    }
+    #chartdiv {
+      width: 100%;
+      height: 500px;
+    }
+    .btnArea {
+      text-align: center;
+    }
+    .btnArea > button {
+      width: 100px;
+      height: 40px;
+    }
+  </style>
+  <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+  <!-- <script src="index.js"></script> -->
+</head>
+
+<body>
+  <div id="wrap">
+    <header id="header">
+      <h1>충청남도 보령시 지역별 강우량 (2021년 01월~10월)</h1>
+    </header>
+    
+    <main class="contianer">
+      <h3 class="location">보령시청</h3>
+      <div id="chartdiv">
+      </div>
+      <div class="btnArea">
+        <button id="cityHall">보령시청</button>
+        <button id="woongCheon">웅천읍</button>
+        <button id="jooPho">주포면</button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+// Set data
+const data = {
+  cityHall: [
+    { month: "1월", value: 27.5 },
+    { month: "2월", value: 8.5 },
+    { month: "3월", value: 84.5 },
+    { month: "4월", value: 46 },
+    { month: "5월", value: 123 },
+    { month: "6월", value: 64.5 },
+    { month: "7월", value: 154.5 },
+    { month: "8월", value: 225 },
+    { month: "9월", value: 216.5 },
+    { month: "10월", value: 46 },
+  ],
+  woongCheon: [
+    { month: "1월", value: 34 },
+    { month: "2월", value: 19 },
+    { month: "3월", value: 90 },
+    { month: "4월", value: 50.5 },
+    { month: "5월", value: 141 },
+    { month: "6월", value: 73.5 },
+    { month: "7월", value: 103 },
+    { month: "8월", value: 225 },
+    { month: "9월", value: 195.5 },
+    { month: "10월", value: 29.5 },
+  ],
+  jooPho: [
+    { month: "1월", value: 31.5 },
+    { month: "2월", value: 14.5 },
+    { month: "3월", value: 89 },
+    { month: "4월", value: 47.5 },
+    { month: "5월", value: 127.5 },
+    { month: "6월", value: 68.5 },
+    { month: "7월", value: 178.5 },
+    { month: "8월", value: 297.5 },
+    { month: "9월", value: 253.5 },
+    { month: "10월", value: 35 },
+  ]
+};
+
+class CreateChart {
+  constructor() {
+    this.data;
+
+    this.root = am5.Root.new("chartdiv");
+
+    this.root.setThemes([
+      am5themes_Animated.new(this.root)
+    ]);
+
+    this.chart = this.root.container.children.push(am5xy.XYChart.new(this.root, {
+      panX: true,
+      panY: true,
+      wheelX: "panX",
+      wheelY: "zoomX",
+      pinchZoomX:true
+    }));
+
+    this.xRenderer = am5xy.AxisRendererX.new(this.root, { minGridDistance: 30 });
+    this.xRenderer.labels.template.setAll({
+      rotation: -90,
+      centerY: am5.p50,
+      centerX: am5.p100,
+      paddingRight: 15
+    });
+    this.xAxis = this.chart.xAxes.push(am5xy.CategoryAxis.new(this.root, {
+      maxDeviation: 0.3,
+      categoryField: "month",
+      renderer: this.xRenderer,
+      tooltip: am5.Tooltip.new(this.root, {})
+    }));
+
+    this.yAxis = this.chart.yAxes.push(am5xy.ValueAxis.new(this.root, {
+      maxDeviation: 0.3,
+      renderer: am5xy.AxisRendererY.new(this.root, {})
+    }));
+
+    this.series = this.chart.series.push(am5xy.ColumnSeries.new(this.root, {
+      name: "Series 1",
+      xAxis: this.xAxis,
+      yAxis: this.yAxis,
+      valueYField: "value",
+      sequencedInterpolation: true,
+      categoryXField: "month",
+      tooltip: am5.Tooltip.new(this.root, {
+        labelText:"{valueY}"
+      })
+    }));
+
+    this.cursor = this.chart.set("cursor", am5xy.XYCursor.new(this.root, {}));
+    this.cursor.lineY.set("visible", false);
+    this.series.appear(1000);
+    this.chart.appear(1000, 100);
+  }
+
+  set data(_data) {
+    this.xAxis.data.setAll(_data);
+    this.series.data.setAll(_data);
+  }
+}
+
+const createChart = new CreateChart();
+createChart.data = data.cityHall;
+
+  document.querySelector("#cityHall").addEventListener("click", function() {
+    createChart.data = data.cityHall;
+    document.querySelector(".location").textContent="보령시청";
+  });
+
+  document.querySelector("#woongCheon").addEventListener("click", function() {
+    createChart.data = data.woongCheon;
+    document.querySelector(".location").textContent="웅천읍";
+  });
+
+  document.querySelector("#jooPho").addEventListener("click", function() {
+    createChart.data = data.jooPho;
+    document.querySelector(".location").textContent="주포면";
+  });
+  </script>
+</body>
+</html>
